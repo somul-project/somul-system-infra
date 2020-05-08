@@ -13,3 +13,4 @@ output "is_prod" {
 output "is_staging" {
   value = terraform.workspace == "staging"
 }
+
