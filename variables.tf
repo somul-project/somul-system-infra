@@ -32,9 +32,3 @@ variable "elb_certificate" {
     }
 }
 
-variable "vpc_env" {
-    default = {
-        "prod" = "172.33.0.0/16"
-        "staging" = "172.32.0.0/16"
-    }
-}

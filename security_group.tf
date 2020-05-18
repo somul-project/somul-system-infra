@@ -2,8 +2,7 @@
 resource "aws_security_group" "default" {
   name        = "server-${module.variables.env}-security-group"
   description = "Allow every traffics to instances"
-  vpc_id      = "${aws_vpc.main_vpc.id}"
-
+  vpc_id      = data.aws_vpc.default.id
   ingress {
     from_port   = 0
     to_port     = 0
@@ -18,3 +17,4 @@ resource "aws_security_group" "default" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
 }
+

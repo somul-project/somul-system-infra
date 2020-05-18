@@ -1,23 +1,30 @@
+data "aws_subnet_ids" "all" {
+  vpc_id = data.aws_vpc.default.id
+}
+
 resource "aws_lb" "server_lb" {
   name               = "server-${module.variables.env}-nlb"
   internal           = false
   load_balancer_type = "network"
-  subnets            = ["${aws_subnet.main_subnet.id}"]
-
+  subnets            = data.aws_subnet_ids.all.ids
   enable_deletion_protection = false
 
   tags = {
     Environment = "${(module.variables.is_prod) ? "production" : "staging"}"
   }
-
-  depends_on = ["aws_internet_gateway.main_vpc_igw"]
 }
 
 resource "aws_lb_target_group" "server_target_group" {
   name     = "server-${module.variables.env}-target-group"
-  port     = 80
+  port     = 8000
   protocol = "TCP"
-  vpc_id   = "${aws_vpc.main_vpc.id}"
+  vpc_id      = data.aws_vpc.default.id
+}
+
+resource "aws_lb_target_group_attachment" "server_cluster_attachment" {
+  target_group_arn = "${aws_lb_target_group.server_target_group.arn}"
+  target_id        = "${aws_instance.server.id}"
+  port             = 8000
 }
 
 resource "aws_lb_listener" "server_https" {
@@ -32,3 +39,4 @@ resource "aws_lb_listener" "server_https" {
     target_group_arn = "${aws_lb_target_group.server_target_group.arn}"
   } 
 }
+
